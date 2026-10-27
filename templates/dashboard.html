@@ -1,0 +1,194 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SmartHeal | Student Portal</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: #F3F8F5;
+            color: #1B332B;
+        }
+
+        header {
+            background: #12352B;
+            color: white;
+            padding: 20px 5%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        header strong {
+            font-size: 18px;
+        }
+
+        header a {
+            color: white;
+            text-decoration: none;
+        }
+
+        header a:hover {
+            color: #B9E8D3;
+        }
+
+        main {
+            max-width: 1050px;
+            margin: 30px auto;
+            padding: 0 16px;
+        }
+
+        h1, h2, h3 {
+            color: #12352B;
+        }
+
+        .cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 18px;
+        }
+
+        .card {
+            background: #FFFFFF;
+            padding: 24px;
+            border-radius: 12px;
+            border: 1px solid #DCE9E1;
+            box-shadow: 0 3px 15px rgba(18, 53, 43, 0.06);
+        }
+
+        .card h3 {
+            margin-top: 0;
+        }
+
+        .number {
+            font-size: 32px;
+            font-weight: bold;
+            margin: 12px 0;
+            color: #0F6B56;
+            overflow-wrap: anywhere;
+        }
+
+        .green {
+            background: #E1F5E9;
+        }
+
+        .blue {
+            background: #E8F3EE;
+        }
+
+        .orange {
+            background: #FFF4DF;
+        }
+
+        .panel {
+            background: #FFFFFF;
+            padding: 24px;
+            border-radius: 12px;
+            margin-top: 22px;
+            border: 1px solid #DCE9E1;
+            box-shadow: 0 3px 15px rgba(18, 53, 43, 0.06);
+        }
+
+        .panel h2 {
+            margin-top: 0;
+        }
+
+        .muted {
+            color: #61756B;
+            line-height: 1.6;
+        }
+
+        @media (max-width: 600px) {
+            header {
+                padding: 16px 5%;
+            }
+
+            main {
+                margin: 22px auto;
+                padding: 0 12px;
+            }
+
+            .cards {
+                grid-template-columns: 1fr;
+            }
+
+            .card, .panel {
+                padding: 20px;
+            }
+
+            .number {
+                font-size: 28px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+<header>
+    <strong>🎓 SmartHeal Student Portal</strong>
+
+    <span>
+        {{ session.get('full_name') }}
+        · <a href="{{ url_for('logout') }}">Logout</a>
+    </span>
+</header>
+
+<main>
+    <h1>Welcome, {{ session.get('full_name') }}!</h1>
+    <p class="muted">Here are your academic records.</p>
+
+    <section class="cards">
+        <article class="card green">
+            <h3>Attendance</h3>
+
+            <div class="number">
+                {{ "%.1f"|format(record['attendance']) if record else "0.0" }}%
+            </div>
+
+            <p>Your recorded attendance</p>
+        </article>
+
+        <article class="card blue">
+            <h3>Overall Marks</h3>
+
+            <div class="number">
+                {{ "%.1f"|format(record['marks']) if record else "0.0" }}%
+            </div>
+
+            <p>Your recorded marks</p>
+        </article>
+
+        <article class="card orange">
+            <h3>Assignments</h3>
+
+            <div class="number">
+                {{ record['assignments'] if record else 0 }}
+            </div>
+
+            <p>Assignments recorded by your administrator</p>
+        </article>
+    </section>
+
+    <section class="panel">
+        <h2>My Account</h2>
+
+        <p><strong>Username:</strong> {{ session.get('username') }}</p>
+        <p><strong>Role:</strong> Student</p>
+
+        <p class="muted">
+            Contact your administrator if your academic information is incorrect.
+        </p>
+    </section>
+</main>
+</body>
+</html>

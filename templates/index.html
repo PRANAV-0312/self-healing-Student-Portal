@@ -1,0 +1,852 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SmartHeal | Self-Healing Monitor</title>
+    <link rel="stylesheet" href="/style.css">
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+            background: #f2f5fb;
+            color: #17233c;
+            font-family: Arial, sans-serif;
+        }
+
+        .layout {
+            display: grid;
+            grid-template-columns: minmax(0, 1fr) 320px;
+            min-height: 100vh;
+        }
+
+        .main {
+            padding: 34px;
+            min-width: 0;
+        }
+
+        .topline {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 16px;
+            margin-bottom: 28px;
+        }
+
+        .brand {
+            font-size: 25px;
+            font-weight: 800;
+            margin: 0;
+        }
+
+        .eyebrow {
+            color: #64748b;
+            font-size: 13px;
+            margin-top: 7px;
+        }
+
+        .status-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: #e0f2e9;
+            color: #166534;
+            padding: 9px 13px;
+            border-radius: 999px;
+            font-size: 13px;
+            font-weight: 700;
+        }
+
+        .dot {
+            width: 8px;
+            height: 8px;
+            background: currentColor;
+            border-radius: 50%;
+        }
+
+        .hero {
+            background: linear-gradient(135deg, #12352B,#0F6B56);
+            color: white;
+            border-radius: 20px;
+            padding: 28px;
+            margin-bottom: 22px;
+        }
+
+        .hero h2 {
+            margin: 0 0 10px;
+            font-size: clamp(23px, 3vw, 32px);
+        }
+
+        .hero p {
+            margin: 0;
+            color: #dbeafe;
+            line-height: 1.6;
+            max-width: 720px;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 16px;
+            margin-bottom: 22px;
+        }
+
+        .metric,
+        .panel {
+            background: white;
+            border: 1px solid #e3e9f3;
+            border-radius: 16px;
+            padding: 21px;
+            box-shadow: 0 8px 24px rgba(25, 45, 80, 0.04);
+        }
+
+        .metric h3 {
+            margin: 0 0 13px;
+            font-size: 14px;
+            color: #64748b;
+        }
+
+        .metric strong {
+            display: block;
+            font-size: 23px;
+            text-transform: capitalize;
+        }
+
+        .metric p {
+            margin: 9px 0 0;
+            color: #64748b;
+            font-size: 12px;
+        }
+
+        .columns {
+            display: grid;
+            grid-template-columns: minmax(0, 1.15fr) minmax(0, 0.85fr);
+            gap: 18px;
+        }
+
+        .panel h2 {
+            font-size: 19px;
+            margin: 0 0 8px;
+        }
+
+        .muted {
+            color: #64748b;
+            font-size: 13px;
+            line-height: 1.6;
+        }
+
+        .field {
+            width: 100%;
+            border: 1px solid #ccd6e5;
+            padding: 11px 12px;
+            border-radius: 9px;
+            background: white;
+            color: #17233c;
+            margin: 8px 0 12px;
+        }
+
+        .buttons {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-top: 12px;
+        }
+
+        .btn {
+            display: inline-block;
+            border: 0;
+            border-radius: 9px;
+            padding: 11px 15px;
+            font-weight: 700;
+            cursor: pointer;
+            font-size: 14px;
+            font-family: inherit;
+            text-align: center;
+            text-decoration: none;
+        }
+
+        .btn:disabled {
+            opacity: 0.55;
+            cursor: not-allowed;
+        }
+
+        .primary {
+            background: #0F6B56;
+            color: white;
+        }
+
+        .primary:hover {
+            background: #0F6B56;
+        }
+
+        .danger {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        .success {
+            background: #dcfce7;
+            color: #166534;
+        }
+
+        .outline {
+            background: white;
+            border: 1px solid #ccd6e5;
+            color: #243653;
+        }
+
+        .report {
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 10px;
+            padding: 13px;
+            margin-top: 14px;
+            min-height: 54px;
+            white-space: pre-wrap;
+            overflow-wrap: anywhere;
+            font-size: 13px;
+            line-height: 1.55;
+        }
+
+        .right {
+            background: white;
+            border-left: 1px solid #e1e7f0;
+            padding: 30px 24px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .login-card {
+            border: 1px solid #e3e9f3;
+            border-radius: 16px;
+            padding: 20px;
+            background: #f9fbff;
+        }
+
+        .login-card h2 {
+            margin: 0 0 8px;
+            font-size: 20px;
+        }
+
+        .login-link {
+            display: block;
+            width: 100%;
+            margin-top: 16px;
+            padding: 13px 16px;
+            background: #315efb;
+            color: white;
+            border-radius: 9px;
+            text-decoration: none;
+            text-align: center;
+            font-weight: 700;
+            transition: background 0.2s;
+        }
+
+        .login-link:hover {
+            background: #0F6B56;
+        }
+
+        footer {
+            margin-top: 24px;
+            color: #7b8798;
+            font-size: 12px;
+        }
+
+        @media (max-width: 1100px) {
+            .layout {
+                grid-template-columns: minmax(0, 1fr) 280px;
+            }
+
+            .main {
+                padding: 24px;
+            }
+
+            .right {
+                padding: 24px 18px;
+            }
+
+            .columns {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 900px) {
+            .layout {
+                grid-template-columns: 1fr;
+            }
+
+            .right {
+                border-left: 0;
+                border-top: 1px solid #e1e7f0;
+            }
+
+            .grid {
+                grid-template-columns: 1fr;
+            }
+
+            .main {
+                padding: 20px;
+            }
+
+            .right {
+                padding: 20px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .topline {
+                align-items: flex-start;
+                flex-direction: column;
+            }
+
+            .hero {
+                padding: 22px;
+            }
+
+            .metric,
+            .panel {
+                padding: 17px;
+            }
+
+            .buttons .btn {
+                flex: 1 1 auto;
+            }
+        }
+    </style>
+</head>
+
+<body>
+<div class="layout">
+
+    <main class="main">
+
+        <div class="topline">
+            <div>
+                <h1 class="brand">🛡️ SmartHeal</h1>
+                <div class="eyebrow">
+                    Self-healing system monitor · BCA final-year project
+                </div>
+            </div>
+
+            <div class="status-pill">
+                <span class="dot"></span>
+                <span id="overall-pill">Checking system</span>
+            </div>
+        </div>
+
+        <section class="hero">
+            <h2>System Health &amp; Recovery Center</h2>
+            <p>
+                Monitor live health, inject controlled failures into an
+                isolated test environment, and observe automatic recovery.
+                Student records are never deliberately damaged.
+            </p>
+        </section>
+
+        <!-- System Health Cards -->
+        <section class="grid" aria-label="System health status">
+
+            <div class="metric">
+                <h3>DATABASE</h3>
+                <strong id="database-status">Checking...</strong>
+                <p>SQLite connectivity check</p>
+            </div>
+
+            <div class="metric">
+                <h3>WEB SERVER</h3>
+                <strong id="server-status">Checking...</strong>
+                <p>Flask backend response</p>
+
+                <hr style="margin:16px 0;border:0;border-top:1px solid #e3e9f3;">
+
+                <h3 style="color:#17233c;">Response Time Monitor</h3>
+                <strong id="response-current">Measuring...</strong>
+                <p>Current server response time</p>
+            </div>
+
+            <div class="metric">
+                <h3>APPLICATION</h3>
+                <strong id="application-status">Checking...</strong>
+                <p>Overall health assessment</p>
+            </div>
+
+        </section>
+
+        <!-- Error Lab and Automatic Recovery -->
+        <section class="columns">
+
+            <div class="panel">
+                <h2>🧪 Error Generation Lab</h2>
+
+                <p class="muted">
+                    Choose a controlled failure. Database tests use
+                    smartheal_test.db, never the main student database.
+                    Recovery can be run manually or automatically.
+                </p>
+
+                <label for="error-type">Simulation type</label>
+
+                <select class="field" id="error-type">
+                    <option value="service">
+                        Dependency outage (retry + circuit breaker + fallback)
+                    </option>
+                    <option value="database">
+                        Test database table failure (isolated DB)
+                    </option>
+                    <option value="corrupt_record">
+                        Invalid result record (isolated DB)
+                    </option>
+                    <option value="load">
+                        Bounded 100-request load test
+                    </option>
+                </select>
+
+                <div class="buttons">
+                    <button class="btn danger" id="generate-error" type="button">
+                        Generate Test Error
+                    </button>
+
+                    <button class="btn success" id="fix-error" type="button">
+                        Run Recovery
+                    </button>
+                </div>
+
+                <div class="report" id="error-report" role="status">
+                    No simulated error is active.
+                </div>
+            </div>
+
+            <div class="panel">
+                <h2>⚙️ Automatic Recovery</h2>
+
+             
+
+                <label style="display:flex;gap:10px;align-items:center;margin:16px 0;">
+                    <input type="checkbox" id="auto-recovery"
+                           style="width:18px;height:18px;">
+                    Enable auto-recovery
+                </label>
+
+                <div class="buttons">
+                    <button class="btn primary" id="refresh-health" type="button">
+                        Refresh System Health
+                    </button>
+                </div>
+
+                <div class="report" id="auto-report" role="status">
+                    Automatic recovery is disabled.
+                </div>
+
+                <p class="muted" id="last-health-check">
+                    Last health check: not yet run
+                </p>
+            </div>
+
+        </section>
+
+        <!-- Incident Timeline -->
+        <section class="panel" style="margin-top:18px;">
+            <h2>Incident timeline</h2>
+
+            <p class="muted">
+                Lifecycle: Detected → Diagnosed → Action taken → Recovered.
+                Times come from recorded test runs.
+            </p>
+
+            <div style="overflow-x:auto;">
+                <table style="width:100%;border-collapse:collapse;font-size:13px;">
+                    <thead>
+                        <tr>
+                            <th style="text-align:left;padding:9px;border-bottom:1px solid #e2e8f0;">
+                                Incident
+                            </th>
+                            <th style="text-align:left;padding:9px;border-bottom:1px solid #e2e8f0;">
+                                Status
+                            </th>
+                            <th style="text-align:left;padding:9px;border-bottom:1px solid #e2e8f0;">
+                                Detection ms
+                            </th>
+                            <th style="text-align:left;padding:9px;border-bottom:1px solid #e2e8f0;">
+                                Recovery ms
+                            </th>
+                        </tr>
+                    </thead>
+
+                    <tbody id="incident-rows">
+                        <tr>
+                            <td colspan="4" style="padding:10px;">
+                                Loading incidents…
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <p class="muted" id="recovery-count">
+                Verified recoveries: loading…
+            </p>
+        </section>
+
+        <footer>
+            SmartHeal · Smarter. Safer. Always On.
+        </footer>
+
+    </main>
+
+    <!-- Right Sidebar -->
+    <aside class="right">
+
+        <div>
+            <h2 style="margin:0 0 8px;">Portal Access</h2>
+
+            <p class="muted" style="margin:0;">
+                Sign in to open the student portal or administrator panel.
+            </p>
+        </div>
+
+        <!-- Simple Login Button: No Username/Password Form Here -->
+        <div class="login-card">
+            <h2>🔐 Welcome to SmartHeal</h2>
+
+            <p class="muted">
+                Log in to access your student or administrator account.
+            </p>
+
+            <a style="background-color: #0F6B56;" href="{{ url_for('login') }}"
+   class="login-link"
+   target="_blank"
+   rel="noopener noreferrer">
+    Login →
+</a>
+        </div>
+
+        <div class="panel">
+            <h2>How it works</h2>
+
+            <p class="muted">1. Monitor backend health.</p>
+            <p class="muted">2. Generate a safe test incident.</p>
+            <p class="muted">3. Run recovery manually or enable automatic recovery.</p>
+            <p class="muted">4. Log in to access role-protected portals.</p>
+        </div>
+
+    </aside>
+
+</div>
+
+<script>
+const $ = (id) => document.getElementById(id);
+
+let activeSimulatedError = false;
+
+function setActiveError(activeError) {
+    activeSimulatedError = Boolean(activeError);
+    $("generate-error").disabled = activeSimulatedError;
+    $("fix-error").disabled = !activeSimulatedError;
+}
+
+async function syncErrorLabStatus() {
+    const response = await fetch("/api/error-lab/status", {
+        cache: "no-store"
+    });
+    const data = await response.json().catch(() => ({}));
+
+    if (!response.ok) {
+        throw new Error(data.message || "Could not load Error Lab status.");
+    }
+
+    setActiveError(data.active_error);
+    $("auto-recovery").checked = Boolean(data.auto_recovery);
+
+    if (data.active_error) {
+        const failure = data.active_error.issue || data.active_error.type;
+        $("error-report").textContent =
+            `An active test failure is waiting for recovery: ${failure}.\n` +
+            "Click Run Recovery before generating another test error.";
+    }
+
+    return data;
+}
+
+async function loadIncidents() {
+    try {
+        const response = await fetch("/api/incidents", {
+            cache: "no-store"
+        });
+
+        if (!response.ok) {
+            throw new Error("Could not load incidents");
+        }
+
+        const rows = await response.json();
+        const body = $("incident-rows");
+
+        body.replaceChildren();
+
+        if (!rows.length) {
+            const tr = document.createElement("tr");
+            const td = document.createElement("td");
+
+            td.colSpan = 4;
+            td.textContent = "No incidents recorded yet.";
+            td.style.padding = "10px";
+
+            tr.appendChild(td);
+            body.appendChild(tr);
+        }
+
+        for (const item of rows.slice(0, 10)) {
+            const tr = document.createElement("tr");
+
+            [
+                item.issue,
+                item.status,
+                item.detection_ms ?? "—",
+                item.recovery_ms ?? "—"
+            ].forEach(value => {
+                const td = document.createElement("td");
+
+                td.textContent = String(value);
+                td.style.padding = "9px";
+                td.style.borderBottom = "1px solid #eef2f7";
+
+                tr.appendChild(td);
+            });
+
+            body.appendChild(tr);
+        }
+
+        $("recovery-count").textContent =
+            "Verified recoveries: " +
+            rows.filter(item => item.recovered_at).length;
+
+    } catch (error) {
+        $("incident-rows").textContent =
+            "Incident log temporarily unavailable.";
+    }
+}
+
+async function checkHealth() {
+    try {
+        const response = await fetch("/api/health", {
+            cache: "no-store"
+        });
+
+        if (!response.ok) {
+            throw new Error("Health check failed");
+        }
+
+        const data = await response.json();
+        const elapsedMs = Number(data.response_ms);
+
+        $("response-current").textContent =
+            Number.isFinite(elapsedMs) && elapsedMs >= 0
+                ? elapsedMs.toFixed(2) + " ms"
+                : "Unavailable";
+
+        $("database-status").textContent =
+            data.database || "unknown";
+
+        $("server-status").textContent =
+            data.server || (response.ok ? "online" : "degraded");
+
+        $("application-status").textContent =
+            data.application || "unknown";
+
+        $("overall-pill").textContent =
+            data.healthy ? "System healthy" : "System degraded";
+
+        $("last-health-check").textContent =
+            "Last health check: " + new Date().toLocaleTimeString();
+
+        if (data.recovery_count !== undefined) {
+            $("recovery-count").textContent =
+                "Verified recoveries: " + data.recovery_count;
+        }
+
+    } catch (error) {
+        $("database-status").textContent = "unavailable";
+        $("server-status").textContent = "unavailable";
+        $("application-status").textContent = "unavailable";
+        $("response-current").textContent = "Unavailable";
+        $("overall-pill").textContent = "Health check failed";
+
+        $("last-health-check").textContent =
+            "Could not contact the Flask backend.";
+    }
+}
+
+async function postJson(url, body = {}) {
+    const response = await fetch(url, {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify(body)
+    });
+
+    const data = await response.json().catch(() => ({}));
+
+    if (!response.ok) {
+        throw new Error(
+            data.message || data.status || "Request failed"
+        );
+    }
+
+    return data;
+}
+
+async function generateError() {
+    const button = $("generate-error");
+
+    button.disabled = true;
+
+    try {
+        const data = await postJson(
+            "/api/error-lab/generate",
+            { type: $("error-type").value }
+        );
+
+        const recovered = data.recovery_ms !== null
+            && data.recovery_ms !== undefined;
+        setActiveError(recovered ? null : {
+            type: data.failure || $("error-type").value,
+            issue: data.failure || $("error-type").value
+        });
+
+        $("error-report").textContent =
+            `${data.status || "Test error generated"}\n` +
+            `${data.details || ""}\n` +
+            `${data.message || ""}`;
+
+        await checkHealth();
+        await loadIncidents();
+
+        if ($("auto-recovery").checked && recovered) {
+            $("auto-report").textContent =
+                `Automatic recovery: ${data.status || "complete"}\n` +
+                `${data.message || ""}`;
+        }
+
+    } catch (error) {
+        let activeError = null;
+        try {
+            const status = await syncErrorLabStatus();
+            activeError = status.active_error;
+        } catch (statusError) {
+            console.error("Could not synchronize Error Lab status:", statusError);
+        }
+
+        $("error-report").textContent = activeError
+            ? `Could not generate test error: ${error.message}\n` +
+              `An active ${activeError.issue || activeError.type} test is waiting. ` +
+              "Click Run Recovery before trying again."
+            : "Could not generate test error: " + error.message +
+              "\nCheck the Flask backend and Error Lab configuration.";
+
+    } finally {
+        button.disabled = activeSimulatedError;
+    }
+}
+
+async function runRecovery(automatic = false) {
+    const button = $("fix-error");
+
+    button.disabled = true;
+
+    try {
+        const data = await postJson("/api/error-lab/fix");
+
+        setActiveError(null);
+
+        const message =
+            `${automatic ? "Automatic recovery" : "Recovery"}: ` +
+            `${data.status || (data.success ? "complete" : "failed")}\n` +
+            `${data.action || ""}\n` +
+            `${data.message || ""}`;
+
+        $("error-report").textContent = message;
+
+        $("auto-report").textContent = automatic
+            ? message
+            : "Manual recovery completed.";
+
+        await checkHealth();
+        await loadIncidents();
+
+    } catch (error) {
+        const message = "Recovery not run: " + error.message;
+
+        $("error-report").textContent = message;
+
+        try {
+            await syncErrorLabStatus();
+        } catch (statusError) {
+            console.error("Could not synchronize Error Lab status:", statusError);
+        }
+
+        if (automatic) {
+            $("auto-report").textContent = message;
+        }
+
+    } finally {
+        button.disabled = !activeSimulatedError;
+    }
+}
+
+$("generate-error").addEventListener("click", generateError);
+
+$("fix-error").addEventListener("click", () => {
+    runRecovery(false);
+});
+
+$("refresh-health").addEventListener("click", async () => {
+    await checkHealth();
+    await loadIncidents();
+});
+
+$("auto-recovery").addEventListener("change", async (event) => {
+    try {
+        const enabled = event.target.checked;
+
+        await postJson("/api/error-lab/settings", {
+            auto_recovery: enabled
+        });
+
+        $("auto-report").textContent = enabled
+            ? "Auto-recovery enabled. New failure tests will trigger recovery."
+            : "Automatic recovery is disabled.";
+
+        if (enabled && activeSimulatedError) {
+            await runRecovery(true);
+        }
+
+    } catch (error) {
+        event.target.checked = !event.target.checked;
+
+        $("auto-report").textContent =
+            "Could not update auto-recovery: " + error.message;
+    }
+});
+
+syncErrorLabStatus().catch(error => {
+    $("error-report").textContent =
+        "Could not load Error Lab status: " + error.message;
+});
+checkHealth();
+loadIncidents();
+
+setInterval(() => {
+    checkHealth();
+    loadIncidents();
+}, 5000);
+</script>
+
+</body>
+</html>

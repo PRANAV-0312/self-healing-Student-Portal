@@ -1,0 +1,305 @@
+ 
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SmartHeal | Admin Panel</title>
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: #F3F8F5;
+            color: #1B332B;
+        }
+
+        header {
+            background: #12352B;
+            color: white;
+            padding: 18px 5%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        a {
+            color: #0F6B56;
+        }
+
+        header a {
+            color: white;
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+        header a:hover {
+            color: #B9E8D3;
+        }
+
+        main {
+            max-width: 1150px;
+            margin: 25px auto;
+            padding: 0 16px;
+        }
+
+        .panel {
+            background: #FFFFFF;
+            padding: 22px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            border: 1px solid #DCE9E1;
+            box-shadow: 0 3px 12px rgba(18, 53, 43, 0.06);
+        }
+
+        h2 {
+            margin-top: 0;
+            color: #12352B;
+        }
+
+        p {
+            color: #61756B;
+            line-height: 1.5;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 14px;
+        }
+
+        label {
+            display: block;
+            font-size: 14px;
+            color: #1B332B;
+            min-width: 0;
+        }
+
+        input {
+            display: block;
+            width: 100%;
+            min-width: 0;
+            padding: 10px;
+            margin-top: 6px;
+            border: 1px solid #DCE9E1;
+            border-radius: 6px;
+            background: #FFFFFF;
+            color: #1B332B;
+        }
+
+        input:focus {
+            outline: 2px solid #16856B;
+            border-color: #16856B;
+        }
+
+        button {
+            background: #16856B;
+            color: white;
+            border: 0;
+            border-radius: 6px;
+            padding: 10px 14px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        button:hover {
+            background: #0F6B56;
+        }
+
+        .submit {
+            margin-top: 16px;
+        }
+
+        .notice {
+            background: #E1F5E9;
+            color: #12352B;
+            padding: 10px;
+            border-radius: 6px;
+            border: 1px solid #C5E8D3;
+        }
+
+        .table-wrap {
+            overflow-x: auto;
+        }
+
+        table {
+            border-collapse: collapse;
+            width: 100%;
+            min-width: 760px;
+        }
+
+        th, td {
+            padding: 12px;
+            border-bottom: 1px solid #DCE9E1;
+            text-align: left;
+        }
+
+        th {
+            background: #EAF4EE;
+            color: #12352B;
+        }
+
+        td small {
+            color: #61756B;
+        }
+
+        td input {
+            min-width: 85px;
+        }
+
+        .edit-form {
+            display: flex;
+            gap: 8px;
+            align-items: end;
+        }
+
+        .edit-form label {
+            flex: 1;
+        }
+
+        @media (max-width: 700px) {
+            header {
+                padding: 16px 5%;
+            }
+
+            main {
+                margin-top: 16px;
+                padding: 0 10px;
+            }
+
+            .panel {
+                padding: 16px;
+            }
+
+            .edit-form {
+                min-width: 600px;
+            }
+        }
+    </style>
+</head>
+<body>
+<header>
+    <strong>🛡️ SmartHeal Admin Panel</strong>
+    <span>
+        Welcome, {{ session.get('full_name') }} ·
+        <a href="{{ url_for('logout') }}">Logout</a>
+    </span>
+</header>
+
+<main>
+    <section class="panel">
+        <h2>Add a Student</h2>
+        <p>Create a login account and save the student's academic details.</p>
+
+        {% with messages = get_flashed_messages() %}
+            {% for message in messages %}
+                <p class="notice">{{ message }}</p>
+            {% endfor %}
+        {% endwith %}
+
+        <form method="POST" action="{{ url_for('admin_panel') }}">
+            <div class="form-grid">
+                <label>Full name
+                    <input name="full_name" required>
+                </label>
+
+                <label>Username
+                    <input name="username" required>
+                </label>
+
+                <label>Initial password (8+ characters)
+                    <input name="password" type="password"
+                           minlength="8" required>
+                </label>
+
+                <label>Attendance (%)
+                    <input name="attendance" type="number"
+                           min="0" max="100" step="0.1"
+                           value="0" required>
+                </label>
+
+                <label>Overall marks (%)
+                    <input name="marks" type="number"
+                           min="0" max="100" step="0.1"
+                           value="0" required>
+                </label>
+
+                <label>Pending assignments
+                    <input name="assignments" type="number"
+                           min="0" step="1" value="0" required>
+                </label>
+            </div>
+
+            <button class="submit" type="submit">Create Student</button>
+        </form>
+    </section>
+
+    <section class="panel">
+        <h2>Student Records</h2>
+
+        {% if students %}
+        <div class="table-wrap">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Name / Username</th>
+                        <th>Attendance</th>
+                        <th>Marks</th>
+                        <th>Assignments</th>
+                        <th>Update</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                {% for student in students %}
+                    <tr>
+                        <td>
+                            <strong>{{ student['full_name'] }}</strong><br>
+                            <small>{{ student['username'] }}</small>
+                        </td>
+
+                        <td colspan="4">
+                            <form class="edit-form" method="POST"
+                                  action="{{ url_for('update_student', user_id=student['id']) }}">
+
+                                <label>Attendance
+                                    <input name="attendance" type="number"
+                                           min="0" max="100" step="0.1"
+                                           value="{{ student['attendance'] or 0 }}"
+                                           required>
+                                </label>
+
+                                <label>Marks
+                                    <input name="marks" type="number"
+                                           min="0" max="100" step="0.1"
+                                           value="{{ student['marks'] or 0 }}"
+                                           required>
+                                </label>
+
+                                <label>Assignments
+                                    <input name="assignments" type="number"
+                                           min="0" step="1"
+                                           value="{{ student['assignments'] or 0 }}"
+                                           required>
+                                </label>
+
+                                <button type="submit">Save</button>
+                            </form>
+                        </td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+            <p>No student accounts have been created yet.</p>
+        {% endif %}
+    </section>
+</main>
+</body>
+</html>
